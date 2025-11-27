@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사과의 꿈 - 제 4장</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="cursor.css">
+    <style>
+        @font-face {
+            font-family: 'YeolrinMyeongjo-Regular';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/YeolrinMyeongjo-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'YeolrinMyeongjo-Bold';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/YeolrinMyeongjo-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            /* Start Black */
+            color: #fff;
+            font-family: 'YeolrinMyeongjo-Regular', serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* cursor: pointer; - Removed */
+            /* 통일된 커서 스타일 */
+            transition: background-color 2s ease-in-out;
+            /* Smooth transition */
+        }
+
+        /* --- Visual Effects Layers --- */
+        .effect-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            transition: all 1s ease-in-out;
+        }
+
+        .blur-layer {
+            backdrop-filter: blur(30px);
+            opacity: 1;
+            z-index: 10;
+            transition: opacity 3s ease-out;
+        }
+
+        .green-overlay {
+            background-color: #00ff00;
+            mix-blend-mode: overlay;
+            opacity: 0;
+            /* Start invisible */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .red-flash {
+            background-color: rgba(255, 0, 0, 0.5);
+            mix-blend-mode: multiply;
+            opacity: 0;
+        }
+
+        .white-out {
+            background-color: #fff;
+            opacity: 0;
+            z-index: 100;
+            transition: opacity 3s ease-in;
+        }
+
+        /* --- Content --- */
+        .story-container {
+            position: relative;
+            z-index: 20;
+            text-align: center;
+            width: 80%;
+            max-width: 800px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .story-line {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+            display: none;
+        }
+
+        .story-line.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .keyword {
+            color: #ff0000;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .keyword:hover {
+            text-shadow: 2px 0 #fff, -2px 0 #fff;
+            letter-spacing: 2px;
+            filter: blur(0.5px);
+            transform: scale(1.1);
+        }
+
+
+
+        /* Notification UI */
+        .notification-popup {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50px);
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            z-index: 50;
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-popup.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+            animation-iteration-count: infinite;
+        }
+
+        /* Pulse Animation for Green */
+        @keyframes pulse-green {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .pulse-active {
+            animation: pulse-green 0.5s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Audio -->
+    <audio id="notification-sound" src="tiring.mp3" preload="auto"></audio>
+
+    <!-- Visual Layers -->
+    <div id="blur-layer" class="effect-layer blur-layer"></div>
+    <div id="green-layer" class="effect-layer green-overlay"></div>
+    <div id="red-layer" class="effect-layer red-flash"></div>
+    <div id="white-layer" class="effect-layer white-out"></div>
+
+    <!-- Notification UI -->
+    <div id="notification-popup" class="notification-popup">
+        <div class="notification-icon">!</div>
+        <div class="notification-text">새로운 메시지 도착</div>
+    </div>
+
+    <!-- Cursor handled by interactive.js -->
+    <!-- <div class="custom-cursor" id="custom-cursor"></div> -->
+
+    <!-- Content -->
+    <div class="story-container" id="story-container">
+        <!-- Scene 1: Waking Up -->
+        <div class="story-line" data-duration="3000">
+            “띠링.”<br>
+            갑자기 핸드폰에서 문자 수신 알림이 울렸다.
+        </div>
+        <div class="story-line" data-duration="4000">
+            나는 소스라치게 놀랐다.<br>
+            눈을 떠보니, 7월 6일 오전 10시 46분, 아침이었다.
+        </div>
+        <div class="story-line" data-duration="4000">
+            손에 쥔 포크에는 <span class="keyword">사과</span>가 꽂혀 있다.<br>
+            <span class="keyword">사과</span>를 먹다 잠에 들었나 보다.
+        </div>
+        <div class="story-line" data-duration="5000">
+            입 안의 <span class="keyword">사과</span> 덩어리가 왠지 포슬포슬하게 느껴졌다.<br>
+            침을 삼켜 넘기려 했지만, 넘어가지 않았다.<br>
+            입 안이 타는 듯이 말랐다.
+        </div>
+
+        <!-- Scene 2: Bathroom -->
+        <div class="story-line" data-duration="4000">
+            화장실에 들어갔다. 초록빛 변기 앞에 섰다.<br>
+            고개를 숙였다. 무릎을 꿇었다.
+        </div>
+        <div class="story-line" data-duration="3000">
+            변기 커버를 잡고 모든 걸 게워냈다.
+        </div>
+
+        <!-- Scene 3: Vomit -->
+        <div class="story-line" data-duration="5000">
+            분명 내가 먹은 <span class="keyword">사과</span>는 초록색이었는데,<br>
+            자꾸 <span class="keyword">빨간 덩어리</span>와 물이 나왔다.
+        </div>
+        <div class="story-line" data-duration="4000">
+            어지러웠다.<br>
+            몇 번이고 게워낸 후, 화장실 문을 열었다.
+        </div>
+
+        <!-- Scene 4: Door / Light -->
+        <div class="story-line" data-duration="4000">
+            이상하게 문 밖이 환했다. 아니, 과했다.<br>
+            밖에서 빛이 이렇게까지 쏟아져도 되는 걸까?
+        </div>
+        <div class="story-line" data-duration="4000">
+            문 밖으로 발을 디뎠을 때까지만 해도 몰랐다.<br>
+            따뜻한 내 발에 낯선 촉감이 느껴졌다.
+        </div>
+        <div class="story-line" data-duration="3000">
+            “이게 뭐지?”
+        </div>
+    </div>
+
+    <script src="interactive.js"></script>
+    <script>
+        // const cursor = document.getElementById('custom-cursor'); // Handled by interactive.js
+        const notificationSound = document.getElementById('notification-sound');
+        const notificationPopup = document.getElementById('notification-popup');
+
+        // Layers
+        const blurLayer = document.getElementById('blur-layer');
+        const greenLayer = document.getElementById('green-layer');
+        const redLayer = document.getElementById('red-layer');
+        const whiteLayer = document.getElementById('white-layer');
+
+
+
+        // Initialize Cursor Text
+        function setCursorClick() {
+            const cursor = document.querySelector('.custom-cursor');
+            if (cursor) {
+                cursor.classList.add('click-mode');
+                cursor.setAttribute('data-text', 'CLICK');
+            }
+        }
+
+        function resetCursor() {
+            const cursor = document.querySelector('.custom-cursor');
+            if (cursor) {
+                cursor.classList.remove('click-mode');
+                cursor.removeAttribute('data-text');
+            }
+        }
+
+        // Wait for interactive.js to create the cursor
+        setTimeout(setCursorClick, 100);
+
+        // Story Sequencer
+        function startStory() {
+            const lines = document.querySelectorAll('.story-line');
+            let currentIndex = 0;
+
+            // Play Sound
+            notificationSound.play().catch(e => console.log("Audio play failed", e));
+
+            // Show Notification Popup
+            setTimeout(() => {
+                notificationPopup.classList.add('active');
+                // Hide after a few seconds
+                setTimeout(() => {
+                    notificationPopup.classList.remove('active');
+                }, 3000);
+            }, 100); // Slight delay to match sound start
+
+            // Start with blur clearing
+            setTimeout(() => {
+                blurLayer.style.opacity = '0';
+                // Change background to dark grey (Morning/Waking)
+                document.body.style.backgroundColor = '#1a1a1a';
+            }, 1000);
+
+            function showNextLine() {
+                if (currentIndex >= lines.length) return;
+
+                const line = lines[currentIndex];
+                const duration = parseInt(line.dataset.duration) || 3000;
+
+                // Effect Triggers
+                handleEffects(currentIndex);
+
+                line.classList.add('visible');
+                line.style.display = 'block';
+
+                setTimeout(() => {
+                    line.classList.remove('visible');
+                    setTimeout(() => {
+                        line.style.display = 'none';
+                        currentIndex++;
+                        if (currentIndex < lines.length) {
+                            showNextLine();
+                        } else {
+                            console.log("End of Chapter 4");
+                        }
+                    }, 1000); // Fade out time
+                }, duration);
+            }
+
+            showNextLine();
+        }
+
+        function handleEffects(index) {
+            // Reset
+            document.body.classList.remove('shake');
+            greenLayer.classList.remove('pulse-active');
+            redLayer.style.opacity = '0';
+
+            switch (index) {
+                case 4: // Bathroom (Green)
+                    // Change background to Deep Green
+                    document.body.style.backgroundColor = '#001a00';
+                    greenLayer.style.opacity = '0.4'; // Add overlay
+                    break;
+
+                case 6: // Vomit (Red chunks)
+                    // Background becomes chaotic (Dark Red/Green mix via overlay)
+                    document.body.style.backgroundColor = '#0a0000'; // Dark Red base
+                    greenLayer.style.opacity = '0.6';
+                    greenLayer.classList.add('pulse-active'); // Pulse green
+                    redLayer.style.opacity = '0.6'; // Red flash
+                    document.body.classList.add('shake');
+                    break;
+
+                case 7: // Dizzy
+                    document.body.classList.remove('shake');
+                    greenLayer.classList.remove('pulse-active');
+                    redLayer.style.opacity = '0';
+                    // Return to Greenish
+                    document.body.style.backgroundColor = '#001a00';
+                    greenLayer.style.opacity = '0.2';
+                    break;
+
+                case 8: // Open Door
+                    greenLayer.style.opacity = '0';
+                    whiteLayer.style.opacity = '1'; // Blinding light
+                    // Background to White
+                    document.body.style.backgroundColor = '#ffffff';
+                    break;
+            }
+        }
+
+        // Start immediately on load (or click to ensure audio)
+        document.addEventListener('click', () => {
+            if (notificationSound.paused) {
+                resetCursor();
+                startStory();
+            }
+        }, { once: true });
+
+    </script>
+</body>
+
+</html>
